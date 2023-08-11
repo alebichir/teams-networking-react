@@ -82,6 +82,7 @@ function stringToColour(str) {
 type Props = {
   loading: boolean;
   teams: Team[];
+  deleteTeam(id: string): void;
 };
 export function TeamsTable(props: Props) {
   console.info("table props", props);
@@ -116,10 +117,7 @@ export function TeamsTable(props: Props) {
               key={team.id}
               team={team}
               deleteTeam={id => {
-                console.warn("please remove %o", id);
-                // console.warn("delete", id);
-                // await deleteTeamRequest(id);
-                // window.location.reload();
+                props.deleteTeam(id);
               }}
             />
           ))}
@@ -169,21 +167,32 @@ export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.loadTeams();
+  }
+
+  private async loadTeams() {
     const teams = await loadTeamsRequest();
     this.setState({
       loading: false,
       teams
     });
-    console.info(teams);
   }
-
   render() {
     console.info("render", this.state.loading);
 
     return (
       <>
-        <TeamsTable loading={this.state.loading} teams={this.state.teams} />
+        <TeamsTable
+          loading={this.state.loading}
+          teams={this.state.teams}
+          deleteTeam={async id => {
+            console.warn("aici trebuie sa sterg echipa %o", id);
+            this.setState({ loading: true });
+            await deleteTeamRequest(id);
+            this.loadTeams();
+          }}
+        />
       </>
     );
   }

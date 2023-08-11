@@ -1,4 +1,14 @@
-function TeamRow(team) {
+type Team = {
+  id: string;
+  promotion: string;
+  members: string;
+  name: string;
+  url: string;
+  createdBy: string;
+};
+
+function TeamRow(props) {
+  const team = props.team;
   const { id, url } = team;
   const displayUrl = url.startsWith("https://github.com/") ? url.substring(19) : url;
   return (
@@ -74,7 +84,11 @@ export function TeamsTable(props) {
           </tr>
         </thead>
 
-        <tbody className="context">{props.teams.map(team => TeamRow(team))}</tbody>
+        <tbody className="context">
+          {props.teams.map(team => (
+            <TeamRow key={team.id} team={team} />
+          ))}
+        </tbody>
 
         <tfoot>
           <tr>

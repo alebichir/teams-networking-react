@@ -4,10 +4,10 @@ type Team = {
   members: string;
   name: string;
   url: string;
-  createdBy: string;
+  createdBy?: string;
 };
 
-function TeamRow(props) {
+function TeamRow(props: { team: Team }) {
   const team = props.team;
   const { id, url } = team;
   const displayUrl = url.startsWith("https://github.com/") ? url.substring(19) : url;
@@ -57,7 +57,11 @@ function stringToColour(str) {
   return colour;
 }
 
-export function TeamsTable(props) {
+type Props = {
+  loading: boolean;
+  teams: Team[];
+};
+export function TeamsTable(props: Props) {
   console.info("table props", props);
 
   return (
@@ -121,7 +125,7 @@ export function TeamsTable(props) {
 }
 
 export function TeamsTableWrapper() {
-  const teams = [
+  const teams: Team[] = [
     {
       id: "toze8j1610313009673",
       promotion: "html",

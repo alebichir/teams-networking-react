@@ -1,6 +1,6 @@
 ## 🎞 Live Preview
 
-[teams-networking-reactnp](https://alebichir.github.io/teams-networkin-react/)
+[teams-networking-react](https://alebichir.github.io/teams-networkin-react/)
 
 # Getting Started with Create React App
 

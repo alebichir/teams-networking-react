@@ -42,14 +42,14 @@ h2 {
   flex: 1;
 }
 
-#teamsTable {
+.table-view {
   border-collapse: collapse;
   width: 100%;
   table-layout: fixed;
 }
 
-#teamsTable th,
-#teamsTable td {
+.table-view th,
+.table-view td {
   padding: 6px;
   border: 1px solid #057988;
   line-height: 25px;
@@ -59,16 +59,16 @@ h2 {
   overflow: hidden;
 }
 
-#teamsTable th {
+.table-view th {
   background-color: #0798ab;
   color: white;
 }
 
-#teamsTable tr:nth-child(even) {
+.table-view tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-#teamsTable input:not([type="checkbox"]) {
+.table-view input:not([type="checkbox"]) {
   width: 100%;
   box-sizing: border-box;
 }
@@ -77,7 +77,7 @@ h2 {
   width: 90px;
 }
 
-.select-all-col {
+.select-all-column {
   width: 40px;
 }
 
@@ -92,11 +92,11 @@ h2 {
   display: none;
 }
 
-#teamsTable tr:hover .edit-btn {
+.table-view tr:hover .edit-btn {
   display: inline-block;
 }
 
-#teamsTable tr:hover .delete-btn {
+.table-view tr:hover .delete-btn {
   display: inline-block;
 }
 

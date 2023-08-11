@@ -1,44 +1,28 @@
 import React from "react";
-import { ReactNode } from "react";
-import { deleteTeamRequest, loadTeamsRequest } from "./middleware";
+import { createTeamRequest, deleteTeamRequest, loadTeamsRequest, updateTeamRequest } from "./middleware";
+import { Team } from "./models";
 
-type Team = {
-  id: string;
-  promotion: string;
-  members: string;
-  name: string;
-  url: string;
-  createdBy?: string;
-};
-
-type TeamRowProps = {
+type RowProps = {
   team: Team;
-  //deleteTeam(id: string): () => void;
+};
+type RowActions = {
   deleteTeam(id: string): void;
+  startEdit(team: Team): void;
 };
 
-function TeamRow(props: TeamRowProps) {
-  const team = props.team;
-  const { id, url } = team;
+function TeamRow(props: RowProps & RowActions) {
+  const { id, promotion, members, name, url } = props.team;
   const displayUrl = url.startsWith("https://github.com/") ? url.substring(19) : url;
   return (
     <tr>
       <td style={{ textAlign: "center" }}>
-        <input type="checkbox" name="selected" value="${id}" />
+        <input type="checkbox" name="selected" value={id} />
       </td>
+      <td>{promotion}</td>
+      <td>{members}</td>
+      <td>{name}</td>
       <td>
-        <span
-          className="circle-bullet"
-          style={{
-            background: stringToColour(team.promotion)
-          }}
-        ></span>
-        {team.promotion}
-      </td>
-      <td>{team.members}</td>
-      <td>{team.name}</td>
-      <td>
-        <a href="${url}" target="_blank">
+        <a href={url} target="_blank" rel="noreferrer">
           {displayUrl}
         </a>
       </td>
@@ -47,7 +31,7 @@ function TeamRow(props: TeamRowProps) {
           type="button"
           className="action-btn edit-btn"
           onClick={() => {
-            console.warn("edit", id, team);
+            props.startEdit(props.team);
           }}
         >
           &#9998;
@@ -55,7 +39,7 @@ function TeamRow(props: TeamRowProps) {
         <button
           type="button"
           className="action-btn delete-btn"
-          onClick={async () => {
+          onClick={() => {
             props.deleteTeam(id);
           }}
         >
@@ -66,34 +50,114 @@ function TeamRow(props: TeamRowProps) {
   );
 }
 
-function stringToColour(str) {
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  var colour = "#";
-  for (var i = 0; i < 3; i++) {
-    var value = (hash >> (i * 8)) & 0xff;
-    colour += ("00" + value.toString(16)).substr(-2);
-  }
-  return colour;
+type EditRowProps = {
+  team: Team;
+};
+type EditRowActions = {
+  // name: "promotion" | "members"
+  inputChange(name: keyof Team, value: string): void;
+};
+
+function EditTeamRow(props: EditRowProps & EditRowActions) {
+  //console.info("edit row", props);
+  const { id, promotion, members, name, url } = props.team;
+  return (
+    <tr>
+      <td style={{ textAlign: "center" }}>
+        <input type="checkbox" name="selected" value={id} />
+      </td>
+      <td>
+        <input
+          type="text"
+          name="promotion"
+          value={promotion}
+          placeholder="Enter promotion"
+          required
+          onChange={e => {
+            props.inputChange("promotion", e.target.value);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          type="text"
+          name="members"
+          value={members}
+          placeholder="Enter members"
+          required
+          onChange={e => {
+            props.inputChange("members", e.target.value);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          type="text"
+          name="name"
+          value={name}
+          placeholder="Enter name"
+          required
+          onChange={e => {
+            props.inputChange("name", e.target.value);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          type="text"
+          name="url"
+          value={url}
+          placeholder="Enter url"
+          required
+          onChange={e => {
+            props.inputChange("url", e.target.value);
+          }}
+        />
+      </td>
+      <td>
+        <button type="submit" className="action-btn">
+          💾
+        </button>
+        <button type="reset" className="action-btn">
+          ✖
+        </button>
+      </td>
+    </tr>
+  );
 }
 
 type Props = {
   loading: boolean;
   teams: Team[];
-  deleteTeam(id: string): void;
+  team: Team;
 };
-export function TeamsTable(props: Props) {
-  console.info("table props", props);
+type Actions = {
+  deleteTeam(id: string): void;
+  startEdit(team: Team): void;
+  inputChange(name: keyof Team, value: string): void;
+  save(): void;
+  reset(): void;
+};
 
+export function TeamsTable(props: Props & Actions) {
   return (
-    <form id="teamsForm" action="" method="get" className={props.loading ? "loading-mask" : ""}>
-      <table id="teamsTable">
+    <form
+      action=""
+      method="get"
+      className={props.loading ? "loading-mask" : ""}
+      onSubmit={e => {
+        e.preventDefault();
+        props.save();
+      }}
+      onReset={() => {
+        props.reset();
+      }}
+    >
+      <table className="table-view">
         <colgroup>
-          <col className="select-all-col" />
+          <col className="select-all-column" />
           <col style={{ width: "20%" }} />
-          <col style={{ width: "35%" }} />
+          <col style={{ width: "40%" }} />
           <col style={{ width: "25%" }} />
           <col style={{ width: "15%" }} />
           <col className="table-actions" />
@@ -110,39 +174,83 @@ export function TeamsTable(props: Props) {
             <th>Actions</th>
           </tr>
         </thead>
-
-        <tbody className="context">
-          {props.teams.map(team => (
-            <TeamRow
-              key={team.id}
-              team={team}
-              deleteTeam={id => {
-                props.deleteTeam(id);
-              }}
-            />
-          ))}
+        <tbody>
+          {props.teams.map(team => {
+            if (team.id === props.team.id) {
+              return <EditTeamRow key={team.id} team={props.team} inputChange={props.inputChange} />;
+            }
+            return (
+              <TeamRow
+                key={team.id}
+                team={team}
+                deleteTeam={function (id) {
+                  props.deleteTeam(id);
+                }}
+                startEdit={props.startEdit}
+              />
+            );
+          })}
         </tbody>
-
         <tfoot>
           <tr>
             <td></td>
             <td>
-              <input type="text" name="promotion" placeholder="Enter Promotion" required />
+              <input
+                type="text"
+                name="promotion"
+                placeholder="Enter promotion"
+                required
+                value={props.team.id ? "" : props.team.promotion}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("promotion", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="members" placeholder="Enter Members" required />
+              <input
+                type="text"
+                name="members"
+                placeholder="Enter members"
+                required
+                value={props.team.id ? "" : props.team.members}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("members", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="name" placeholder="Enter Name" required />
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter name"
+                required
+                value={props.team.id ? "" : props.team.name}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("name", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <input type="text" name="url" placeholder="Enter URL" required />
+              <input
+                type="text"
+                name="url"
+                placeholder="Enter url"
+                required
+                value={props.team.id ? "" : props.team.url}
+                disabled={!!props.team.id}
+                onChange={e => {
+                  props.inputChange("url", e.target.value);
+                }}
+              />
             </td>
             <td>
-              <button type="submit" className="action-btn" title="Add">
+              <button type="submit" className="action-btn" title="Add" disabled={!!props.team.id}>
                 ➕
               </button>
-              <button type="reset" className="action-btn" title="Cancel">
+              <button type="reset" className="action-btn" title="Reset" disabled={!!props.team.id}>
                 ✖
               </button>
             </td>
@@ -153,47 +261,129 @@ export function TeamsTable(props: Props) {
   );
 }
 
-type WrapperProps = {};
+type WrapperProps = {
+  search: string;
+};
 type State = {
   loading: boolean;
   teams: Team[];
+  team: Team;
 };
+
+function getEmptyTeam() {
+  return {
+    id: "",
+    promotion: "",
+    members: "",
+    name: "",
+    url: ""
+  };
+}
+
 export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      teams: []
+      teams: [],
+      team: getEmptyTeam()
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.loadTeams();
   }
 
   private async loadTeams() {
     const teams = await loadTeamsRequest();
+    console.info("loaded", teams);
     this.setState({
       loading: false,
       teams
     });
   }
+
+  async save() {
+    const team = this.state.team;
+    this.setState({ loading: true });
+    let done: boolean;
+    if (team.id) {
+      const { success } = await updateTeamRequest(team);
+      done = success;
+      await this.loadTeams();
+    } else {
+      const { id, success } = await createTeamRequest(team);
+      done = success;
+      this.setState(state => ({
+        teams: [...state.teams, { ...team, id }]
+      }));
+    }
+    if (done) {
+      this.setState({
+        loading: false,
+        team: getEmptyTeam()
+      });
+    }
+  }
+
+  async deleteTeam(id: string) {
+    this.setState({ loading: true });
+    const status = await deleteTeamRequest(id);
+    if (status.success) {
+      this.loadTeams();
+    }
+  }
+
+  inputChange(name: keyof Team, value: string) {
+    this.setState(state => ({
+      team: {
+        ...state.team,
+        [name]: value
+      }
+    }));
+  }
+
   render() {
-    console.info("render", this.state.loading);
+    console.info("render %o", this.props.search);
+
+    const teams = filterElements(this.state.teams, this.props.search);
 
     return (
-      <>
-        <TeamsTable
-          loading={this.state.loading}
-          teams={this.state.teams}
-          deleteTeam={async id => {
-            console.warn("aici trebuie sa sterg echipa %o", id);
-            this.setState({ loading: true });
-            await deleteTeamRequest(id);
-            this.loadTeams();
-          }}
-        />
-      </>
+      <TeamsTable
+        loading={this.state.loading}
+        teams={teams}
+        team={this.state.team}
+        deleteTeam={id => {
+          this.deleteTeam(id);
+        }}
+        startEdit={team => {
+          this.setState({ team });
+        }}
+        inputChange={(name, value) => {
+          this.inputChange(name, value);
+        }}
+        save={() => {
+          this.save();
+        }}
+        reset={() => {
+          this.setState({ team: getEmptyTeam() });
+        }}
+      />
     );
   }
+}
+
+// => T extends { [key: string]: string }
+function filterElements<T extends {}>(elements: T[], search: string) {
+  if (!search) {
+    return elements;
+  }
+  search = search.trim().toLowerCase();
+  return elements.filter(element => {
+    return Object.entries(element).some(([key, value]) => {
+      if (key !== "id") {
+        return typeof value === "string" ? value.toLowerCase().includes(search) : value === search;
+      }
+    });
+  });
 }

@@ -1,17 +1,17 @@
-#top-menu-bar {
+.menu-bar {
   margin: 0;
   text-align: center;
   background-color: #0798ab;
   color: #fff;
 }
 
-#top-menu-bar li {
+.menu-bar li {
   display: inline-block;
   margin: 0;
   padding: 0;
 }
 
-#top-menu-bar a {
+.menu-bar a {
   cursor: pointer;
   text-decoration: none;
   padding: 5px 15px 5px 15px;
@@ -22,14 +22,14 @@
   transition: 0.5s;
 }
 
-#top-menu-bar a:visited {
+.menu-bar a:visited {
   color: #fff;
 }
 
-#top-menu-bar a.active {
+.menu-bar a.active {
   background-color: #05798899;
 }
 
-#top-menu-bar a:hover {
+.menu-bar a:hover {
   background-color: #057988;
 }

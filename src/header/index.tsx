@@ -1,8 +1,11 @@
 import logo from "../images/network-team-icon.png";
+import { Page } from "../main/models";
 import { MainMenu } from "../menu/MainMenu";
 import "./style.css";
-
-export default function AppHeader() {
+type Props = {
+  activePage: Page;
+};
+export default function AppHeader(props: Props) {
   return (
     <header>
       <div id="header-wrapper">
@@ -10,13 +13,14 @@ export default function AppHeader() {
         <div>
           <h1>Teams Networking</h1>
           <h2>
+            {props.activePage === "home" ? "🏠" : ""}
             CRUD operations example (<strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate,
             <strong>D</strong>elete)
           </h2>
         </div>
       </div>
 
-      <MainMenu />
+      <MainMenu activePage={props.activePage} />
     </header>
   );
 }

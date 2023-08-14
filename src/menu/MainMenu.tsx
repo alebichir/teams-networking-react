@@ -6,9 +6,11 @@ type Props = {
   activePage: Page;
 };
 
-export function MainMenu(props: Props) {
-  const [active, setActive] = useState<Page>(props.activePage);
+type Actions = {
+  setActive(active: Page): void;
+};
 
+export function MainMenu(props: Props & Actions) {
   const elements = [
     { text: "Home", name: "home" },
     { text: "Todos", name: "todos" },
@@ -21,9 +23,9 @@ export function MainMenu(props: Props) {
         <li key={element.name}>
           <a
             href={"#" + element.name}
-            className={active === element.name ? "active" : ""}
+            className={props.activePage === element.name ? "active" : ""}
             onClick={() => {
-              setActive(element.name as Page); //tmp use 'as Page'
+              props.setActive(element.name as Page); //tmp use 'as Page'
             }}
           >
             {element.text}

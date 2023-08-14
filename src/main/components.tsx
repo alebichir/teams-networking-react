@@ -34,7 +34,7 @@ export function HomePage() {
 }
 
 export function TodosPage() {
-  return <TodosApp />;
+  return <div>Todos...</div>;
 }
 type Props = {
   activePage: Page;
@@ -50,7 +50,7 @@ function getActivePage(activePage: Page) {
     case "home":
       return <HomePage />;
     case "todos":
-      return <TodosPage />;
+      return <TodosApp />;
     case "teams":
       return <TeamsPage />;
     default: {

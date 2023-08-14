@@ -1,4 +1,4 @@
-import { Team } from "./models";
+import { Team } from "./teams/models";
 
 let firstName = "yes";
 // firstName = false;

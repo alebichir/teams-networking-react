@@ -1,4 +1,5 @@
 import logo from "../images/network-team-icon.png";
+import { MainMenu } from "../menu/MainMenu";
 import "./style.css";
 
 export default function AppHeader() {
@@ -14,6 +15,8 @@ export default function AppHeader() {
           </h2>
         </div>
       </div>
+
+      <MainMenu />
     </header>
   );
 }

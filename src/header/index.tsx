@@ -19,7 +19,7 @@ export default function AppHeader(props: Props & Actions) {
         <div>
           <h1>Teams Networking</h1>
           <h2>
-            {props.activePage === "home" ? "🏠" : ""}
+            <span className="app-icon">{getIcon(props.activePage)}</span>
             CRUD operations example (<strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate,
             <strong>D</strong>elete)
           </h2>
@@ -29,4 +29,14 @@ export default function AppHeader(props: Props & Actions) {
       <MainMenu activePage={props.activePage} setActive={props.setActive} />
     </header>
   );
+}
+
+const icons: { [key in Page]: string } = {
+  home: "🏡",
+  todos: "📄",
+  teams: "👨‍👩‍👦‍👦"
+};
+
+function getIcon(page: Page) {
+  return icons[page];
 }
